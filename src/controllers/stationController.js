@@ -97,7 +97,7 @@ const changeStationPassword = catchAsync(async (req, res, next) => {
     return handleResponse(res, 404, "Station not found");
   }
   const updatedStation = await updateStationPassword(stationId, newPassword);
-  handleResponse(res, 200, "Station updated", updatedStation);
+  handleResponse(res, 200, "Station password updated", updatedStation);
 });
 
 module.exports = {
