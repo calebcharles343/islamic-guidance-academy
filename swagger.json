@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "title": "Islamic Guidance Academy",
-    "description": "Comprehensive API documentation for islamic-guidance-academy",
+    "description": "Comprehensive API documentation for Islamic Guidance Aacademy",
     "version": "1.0.0"
   },
   "host": "station-slamic-guidance-academy.onrender.com",
