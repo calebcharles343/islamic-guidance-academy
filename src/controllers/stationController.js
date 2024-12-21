@@ -57,7 +57,7 @@ const getAllStations = catchAsync(async (req, res, next) => {
 });
 
 const createStation = catchAsync(async (req, res, next) => {
-  const newStation = await createStationService(req.body);
+  const newStation = await createStationService(req.body, next);
   handleResponse(res, 201, "Station Created", newStation);
 });
 

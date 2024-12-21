@@ -22,7 +22,11 @@ const getAllStationsService = async () => {
   return stations;
 };
 
-const createStationService = async (stationData) => {
+const createStationService = async (stationData, next) => {
+  const stationisExist = Station.findOne({ email: stationData.email });
+  if (stationisExist) {
+    return next(new AppError("Station already exist", 401));
+  }
   let station = new Station(stationData);
   await station.save();
   return station;
