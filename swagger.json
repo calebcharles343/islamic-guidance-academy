@@ -47,9 +47,9 @@
                 "passwordConfirm": { "type": "string" }
               },
               "example": {
-                "name": "test",
-                "email": "calebcharles555@gmail.com",
-                "userName": "calebcharles34@gmail.com",
+                "name": "Company name",
+                "email": "company@gmail.com",
+                "userName": "companyAAA",
                 "station": "63Kw-1446-2401",
                 "phone": "12345678901",
                 "password": "11111111",

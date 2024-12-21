@@ -29,7 +29,7 @@ const stationSchema = new mongoose.Schema(
       type: String,
       required: [true, "Please provide a phone number"],
       minlength: 11,
-      select: false,
+      select: true,
     },
     password: {
       type: String,
