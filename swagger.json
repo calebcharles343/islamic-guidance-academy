@@ -1,12 +1,12 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "Cohort-3 Fullstack Diary API",
-    "description": "Comprehensive API documentation for Fullstack Diary API",
+    "title": "islamic-guidance-academy",
+    "description": "Comprehensive API documentation for islamic-guidance-academy",
     "version": "1.0.0"
   },
-  "host": "tunga-c3-diaryapi.onrender.com",
-  "basePath": "/api/cohort3-fullstack/",
+  "host": "http://localhost:4001",
+  "basePath": "/api/v1/islamic-guidance-academy/",
   "schemes": ["https"],
   "consumes": ["application/json", "multipart/form-data"],
   "produces": ["application/json"],
@@ -20,17 +20,62 @@
   },
   "security": [{ "Bearer": [] }],
   "paths": {
-    "/auth/login": {
+    "/stations/signup": {
       "post": {
-        "tags": ["User Auth"],
-        "description": "Authenticate a user and return a JWT token. The token should be included in the Authorization header for subsequent requests.",
+        "tags": ["Station Auth"],
+        "description": "Create a station.",
         "consumes": ["application/json"],
         "produces": ["application/json"],
         "parameters": [
           {
             "name": "body",
             "in": "body",
-            "description": "User login credentials including email and password (`jwt` token is saved in cookies when successfull).",
+            "description": "Station details including name, email, userName, station, phone, password, and passwordConfirm.",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" },
+                "email": { "type": "string" },
+                "userName": { "type": "string" },
+                "station": {
+                  "type": "string",
+                  "description": "Station ID (dropdown)"
+                },
+                "phone": { "type": "string" },
+                "password": { "type": "string" },
+                "passwordConfirm": { "type": "string" }
+              },
+              "example": {
+                "name": "test",
+                "email": "calebcharles555@gmail.com",
+                "userName": "calebcharles34@gmail.com",
+                "station": "63Kw-1446-2401",
+                "phone": "12345678901",
+                "password": "11111111",
+                "passwordConfirm": "11111111"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": { "description": "Station created." },
+          "400": { "description": "Invalid credentials." },
+          "500": { "description": "Internal server error." }
+        }
+      }
+    },
+    "/stations/login": {
+      "post": {
+        "tags": ["Station Auth"],
+        "description": "Authenticate a station and return a JWT token. The token should be included in the Authorization header for subsequent requests.",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Station login credentials including email and password (`jwt` token is saved in cookies when successful).",
             "required": true,
             "schema": {
               "type": "object",
@@ -44,141 +89,152 @@
         "responses": {
           "200": { "description": "Login successful." },
           "400": { "description": "Invalid login credentials." },
-          "404": { "description": "User not found." },
+          "404": { "description": "Station not found." },
           "500": { "description": "Internal server error." }
         }
       }
     },
-    "/auth/logout": {
+    "/stations/logout": {
       "post": {
-        "tags": ["User Auth"],
-        "description": "Log out user. User has to be logged in to log out (`jwt` token is deleted from cookies when successfull).",
+        "tags": ["Station Auth"],
+        "description": "Log out station. The station has to be logged in to log out (`jwt` token is deleted from cookies when successful).",
         "consumes": ["application/json"],
         "produces": ["application/json"],
         "responses": {
-          "200": { "description": "User logged out successfully." },
-          "404": { "description": "User has to be logged in to log out." },
+          "200": { "description": "Station logged out successfully." },
+          "404": { "description": "Station has to be logged in to log out." },
           "500": { "description": "Internal server error." }
         }
       }
     },
-    "/diary/create": {
-      "post": {
-        "tags": ["Diary"],
-        "description": "Create a diary entry.",
+    "/stations/updateStationPassword/{id}": {
+      "patch": {
+        "tags": ["Station Auth"],
+        "description": "Update a station's password.",
         "consumes": ["application/json"],
         "produces": ["application/json"],
         "parameters": [
           {
-            "name": "body",
-            "in": "body",
-            "description": "Diary entry credentials including title and content.",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {
-                "title": { "type": "string" },
-                "content": { "type": "string" }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "201": { "description": "Entry created successfully." },
-          "400": { "description": "Invalid input." },
-          "404": { "description": "Login required." },
-          "500": { "description": "Internal server error." }
-        }
-      }
-    },
-    "/diary/entry/{entryId}": {
-      "get": {
-        "tags": ["Diary"],
-        "description": "Retrieve a diary entry.",
-        "consumes": ["application/json"],
-        "produces": ["application/json"],
-        "parameters": [
-          {
-            "name": "entryId",
+            "name": "id",
             "in": "path",
             "required": true,
             "type": "string",
-            "description": "Entry ID is needed to retrieve a diary entry."
-          }
-        ],
-        "responses": {
-          "200": { "description": "Entry retrieved successfully." },
-          "401": { "description": "Unauthorized access." },
-          "500": { "description": "Internal server error." }
-        }
-      }
-    },
-    "/diary/entries": {
-      "get": {
-        "tags": ["Diary"],
-        "description": "Retrieve all user diary entries.",
-        "consumes": ["application/json"],
-        "produces": ["application/json"],
-        "responses": {
-          "200": { "description": "Entries retrieved successfully." },
-          "401": { "description": "Unauthorized access." },
-          "500": { "description": "Internal server error." }
-        }
-      }
-    },
-    "/diary/update/{entryId}": {
-      "put": {
-        "tags": ["Diary"],
-        "description": "Update a diary entry.",
-        "consumes": ["application/json"],
-        "produces": ["application/json"],
-        "parameters": [
-          {
-            "name": "entryId",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "description": "Entry ID is needed to update a diary entry."
+            "description": "Station ID is needed to update a station's password."
           },
           {
             "name": "body",
             "in": "body",
-            "description": "Diary entry credentials including title and content.",
+            "description": "Station details including the new password.",
             "required": true,
             "schema": {
               "type": "object",
               "properties": {
-                "title": { "type": "string" },
-                "content": { "type": "string" }
+                "newPassword": { "type": "string" }
               }
             }
           }
         ],
         "responses": {
-          "200": { "description": "Entry updated successfully." },
-          "404": { "description": "Entry not found." },
+          "200": { "description": "Station password updated successfully." },
+          "404": { "description": "Station not found." },
           "500": { "description": "Internal server error." }
         }
       }
     },
-    "/diary/delete/{entryId}": {
-      "delete": {
-        "tags": ["Diary"],
-        "description": "Delete a diary entry.",
+    "/stations/{id}": {
+      "get": {
+        "tags": ["Station"],
+        "description": "Retrieve a station.",
+        "consumes": ["application/json"],
         "produces": ["application/json"],
         "parameters": [
           {
-            "name": "entryId",
+            "name": "id",
             "in": "path",
             "required": true,
             "type": "string",
-            "description": "Entry ID is needed to delete a diary entry."
+            "description": "Station ID is needed to retrieve a station."
           }
         ],
         "responses": {
-          "200": { "description": "Entry deleted successfully." },
-          "400": { "description": "Invalid entry ID." },
-          "404": { "description": "Entry not found." },
+          "200": { "description": "Station retrieved successfully." },
+          "401": { "description": "Unauthorized access." },
+          "500": { "description": "Internal server error." }
+        }
+      }
+    },
+    "/stations": {
+      "get": {
+        "tags": ["Station"],
+        "description": "Retrieve all stations.",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "responses": {
+          "200": { "description": "Success." },
+          "401": { "description": "Unauthorized access." },
+          "500": { "description": "Internal server error." }
+        }
+      }
+    },
+    "/stations/update/{id}": {
+      "patch": {
+        "tags": ["Station"],
+        "description": "Update a station.",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Station ID is needed to update a station."
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Station details including name, email, userName, station, and phone.",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" },
+                "email": { "type": "string" },
+                "userName": { "type": "string" },
+                "station": {
+                  "type": "string",
+                  "description": "Station ID (dropdown)"
+                },
+                "phone": { "type": "string" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Station updated successfully." },
+          "404": { "description": "Station not found." },
+          "500": { "description": "Internal server error." }
+        }
+      }
+    },
+    "/stations/delete/{id}": {
+      "delete": {
+        "tags": ["Station"],
+        "description": "Delete a station.",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Station ID is needed to delete a station."
+          }
+        ],
+        "responses": {
+          "200": { "description": "Station deleted successfully." },
+          "400": { "description": "Invalid station ID." },
+          "404": { "description": "Station not found." },
           "500": { "description": "Internal server error." }
         }
       }

@@ -1,13 +1,15 @@
 const express = require("express");
 const cors = require("cors");
 const connectDB = require("./config/db.js");
-const authRoutes = require("./routes/auth.js");
-const diaryRoutes = require("./routes/diary.js");
+const stationRouter = require("./routes/stationRoutes");
+
 const rateLimit = require("express-rate-limit");
 const helmet = require("helmet");
 
 const swaggerDocument = require("../swagger.json");
 const swaggerUi = require("swagger-ui-express");
+const globalErrorHandler = require("./controllers/errorController");
+const AppError = require("./utils/appError.js");
 
 const app = express();
 
@@ -29,19 +31,25 @@ app.use("/api", limiter);
 
 // Swagger Documentation
 app.use(
-  "/cohort3-fullstack/api-docs",
+  "/islamic-guidance-academy/api-docs",
   swaggerUi.serve,
   swaggerUi.setup(swaggerDocument)
 );
 
 // Routes
-app.use("/api/cohort3-fullstack/auth", authRoutes);
-app.use("/api/cohort3-fullstack/diary", diaryRoutes);
+app.use("/api/v1/islamic-guidance-academy/stations", stationRouter);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log(
-    `API Documentation available at http://localhost:${PORT}/api-docs`
+    `API Documentation available at http://localhost:${PORT}/islamic-guidance-academy/api-docs`
   );
 });
+
+app.all("*", (req, res, next) => {
+  next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
+});
+
+// Error Handling
+app.use(globalErrorHandler);

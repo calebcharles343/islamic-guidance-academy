@@ -1,13 +1,15 @@
 {
-  "name": "diary-api",
+  "name": "islamic-guidance-academy",
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "dev": "nodemon src/server.js",
     "start:prod": "cross-env NODE_ENV=production node src/server.js",
     "start:prod2": "cross-env NODE_ENV=production node src/server.js",
     "start": "cross-env NODE_ENV=production node src/server.js"
   },
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "cross-env": "^7.0.3",
@@ -18,6 +20,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.0.3",
     "swagger-ui-express": "^5.0.0",
+    "validator": "^13.12.0",
     "yamljs": "^0.3.0"
   },
   "engines": {
