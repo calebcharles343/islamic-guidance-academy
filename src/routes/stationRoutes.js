@@ -10,10 +10,11 @@ const {
   deleteStation,
   changeStationPassword,
 } = require("../controllers/stationController");
+const { validateStation } = require("../middleware/inputValidator");
 
 router.post("/login", sationLogin);
 router.post("/logout", sationLogout);
-router.post("/signup", createStation);
+router.post("/signup", validateStation, createStation);
 router.get("/", getAllStations);
 router.get("/:id", getStation);
 router.patch("/update/:id", updateStation);
