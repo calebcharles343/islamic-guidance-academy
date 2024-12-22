@@ -5,7 +5,7 @@
     "description": "Comprehensive API documentation for Islamic Guidance Aacademy",
     "version": "1.0.0"
   },
-  "host": "station-slamic-guidance-academy.onrender.com",
+  "host": "islamic-guidance-academy-station.onrender.com",
   "basePath": "/api/v1/islamic-guidance-academy/",
   "schemes": ["https"],
   "consumes": ["application/json", "multipart/form-data"],
