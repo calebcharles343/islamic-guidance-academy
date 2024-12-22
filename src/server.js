@@ -43,7 +43,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log(
-    `API Documentation available at https://station-slamic-guidance-academy.onrender.com/islamic-guidance-academy/api-docs`
+    `API Documentation available at https://islamic-guidance-academy-station.onrender.com/islamic-guidance-academy/api-docs`
   );
 });
 
