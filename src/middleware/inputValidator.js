@@ -25,13 +25,13 @@ const stationSchema = Joi.object({
       "string.empty": "User Name is required",
       "string.min": "User Name should have at least 3 characters",
     }),
-  station: Joi.string()
-    .valid("63Kw-1446-2401", "63Oy-1446-2401")
-    .required()
-    .messages({
-      "any.only": "Invalid station ID",
-      "any.required": "Station is required",
-    }),
+  station: Joi.string(),
+  // .valid("63Kw-1446-2401", "63Oy-1446-2401")
+  // .required()
+  // .messages({
+  //   "any.only": "Invalid station ID",
+  //   "any.required": "Station is required",
+  // }),
   phone: Joi.string()
     .min(11)
     .regex(/^\d{11}$/) // Allows exactly 11 digits
