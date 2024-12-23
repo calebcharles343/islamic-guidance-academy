@@ -32,13 +32,21 @@ const stationSchema = Joi.object({
       "any.only": "Invalid station ID",
       "any.required": "Station is required",
     }),
-  phone: Joi.string().required().messages({
-    "string.empty": "Phone number is required",
-  }),
-  password: Joi.string().required().messages({
+  phone: Joi.string()
+    .min(11)
+    .regex(/^\d{11}$/) // Allows exactly 11 digits
+    .required()
+    .messages({
+      "string.pattern.base": "Phone number must contain exactly 11 digits",
+      "string.empty": "Phone number is required",
+      "string.min": "Phone number should have exactly 11 digits",
+    }),
+  password: Joi.string().min(8).required().messages({
+    "string.min": "Password should have at least 8 characters",
     "string.empty": "Password is required",
   }),
-  passwordConfirm: Joi.any().required().messages({
+  passwordConfirm: Joi.any().valid(Joi.ref("password")).required().messages({
+    "any.only": "Passwords do not match",
     "any.required": "Confirm password is required",
   }),
 });

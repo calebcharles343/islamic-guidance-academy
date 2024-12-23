@@ -57,6 +57,9 @@ const getAllStations = catchAsync(async (req, res, next) => {
 });
 
 const createStation = catchAsync(async (req, res, next) => {
+  if (req.body.password !== req.body.passwordConfirm) {
+    return handleResponse(res, 400, "Passwords do not match");
+  }
   const newStation = await createStationService(req.body, next);
   handleResponse(res, 201, "Station Created", newStation);
 });
