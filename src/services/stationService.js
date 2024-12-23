@@ -23,13 +23,23 @@ const getAllStationsService = async () => {
 };
 
 const createStationService = async (stationData, next) => {
-  const stationisExist = Station.findOne({ email: stationData.email });
-  if (stationisExist) {
-    return next(new AppError("Station already exist", 401));
+  try {
+    // Check if the station already exists
+    const stationExists = await Station.findOne({ email: stationData.email });
+
+    if (stationExists) {
+      return next(new AppError("Station already exists", 401)); // Assuming `AppError` is a custom error class
+    }
+
+    // Create and save the new station
+    const station = new Station(stationData);
+    await station.save();
+
+    return station; // Return the created station object
+  } catch (error) {
+    // Pass error to the next middleware for centralized error handling
+    return next(error);
   }
-  let station = new Station(stationData);
-  await station.save();
-  return station;
 };
 
 const updateStationService = async (stationId, updateData) => {
