@@ -41,14 +41,8 @@ const stationSchema = Joi.object({
   //   "string.empty": "Phone number is required",
   //   "string.min": "Phone number should have exactly 11 digits",
   // }),
-  password: Joi.string().min(8).required().messages({
-    "string.min": "Password should have at least 8 characters",
-    "string.empty": "Password is required",
-  }),
-  passwordConfirm: Joi.any().valid(Joi.ref("password")).required().messages({
-    "any.only": "Passwords do not match",
-    "any.required": "Confirm password is required",
-  }),
+  password: Joi.string(),
+  passwordConfirm: Joi.any().
 });
 
 exports.validateStation = (req, res, next) => {
