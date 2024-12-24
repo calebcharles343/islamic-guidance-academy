@@ -2,7 +2,8 @@ const Station = require("../models/StationModel");
 const comparePasswords = require("../utils/comparePasswords");
 const AppError = require("../utils/appError");
 
-const sationLoginService = async (email, password, next) => {
+const stationLoginService = async (email, password, next) => {
+  // Correct spelling
   const station = await Station.findOne({ email }).select("+password");
 
   if (!station || !(await comparePasswords(password, station.password))) {
@@ -27,7 +28,7 @@ const createStationService = async (stationData, next) => {
   const stationExists = await Station.findOne({ email: stationData.email });
 
   if (stationExists) {
-    return next(new AppError("Station already exists", 401)); // Assuming `AppError` is a custom error class
+    return next(new AppError("Station already exists", 401)); // Exit early if station exists
   }
 
   // Create and save the new station
@@ -63,7 +64,7 @@ const updateStationPassword = async (stationId, newPassword) => {
 };
 
 module.exports = {
-  sationLoginService,
+  stationLoginService, // Correct spelling
   getStationById,
   getAllStationsService,
   createStationService,

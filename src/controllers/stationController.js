@@ -5,7 +5,7 @@ const {
   updateStationService,
   deleteStationService,
   updateStationPassword,
-  sationLoginService,
+  stationLoginService, // Correct spelling
 } = require("../services/stationService");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
@@ -13,14 +13,15 @@ const comparePasswords = require("../utils/comparePasswords");
 const createSendToken = require("../utils/createSendToken");
 const handleResponse = require("../utils/handleResponse");
 
-const sationLogin = catchAsync(async (req, res, next) => {
+const stationLogin = catchAsync(async (req, res, next) => {
+  // Correct spelling
   const { email, password } = req.body;
 
   if (!email || !password) {
     return handleResponse(res, 400, "Please provide both email and password");
   }
 
-  const station = await sationLoginService(email, password, next);
+  const station = await stationLoginService(email, password, next); // Correct spelling
 
   if (!station) {
     return handleResponse(res, 401, "Invalid credentials");
@@ -34,7 +35,8 @@ const sationLogin = catchAsync(async (req, res, next) => {
   createSendToken(station, 200, res);
 });
 
-const sationLogout = catchAsync(async (req, res, next) => {
+const stationLogout = catchAsync(async (req, res, next) => {
+  // Correct spelling
   res.cookie("jwt", "loggedout", {
     expires: new Date(Date.now() + 10 * 1000),
     httpOnly: true,
@@ -57,11 +59,18 @@ const getAllStations = catchAsync(async (req, res, next) => {
 });
 
 const createStation = catchAsync(async (req, res, next) => {
+  // Check if passwords match
   if (req.body.password !== req.body.passwordConfirm) {
     return handleResponse(res, 400, "Passwords do not match");
   }
+
+  // Call the service and handle the response
   const newStation = await createStationService(req.body, next);
-  handleResponse(res, 201, "Station Created", newStation);
+
+  // If `createStationService` calls `next`, execution won't reach here
+  if (newStation) {
+    handleResponse(res, 201, "Station Created", newStation);
+  }
 });
 
 const updateStation = catchAsync(async (req, res, next) => {
@@ -104,8 +113,8 @@ const changeStationPassword = catchAsync(async (req, res, next) => {
 });
 
 module.exports = {
-  sationLogin,
-  sationLogout,
+  stationLogin, // Correct spelling
+  stationLogout, // Correct spelling
   getStation,
   getAllStations,
   createStation,

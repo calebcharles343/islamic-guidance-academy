@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const {
-  sationLogin,
-  sationLogout,
+  stationLogin,
+  stationLogout,
   getStation,
   getAllStations,
   createStation,
@@ -10,11 +10,11 @@ const {
   deleteStation,
   changeStationPassword,
 } = require("../controllers/stationController");
-const { validateStation } = require("../middleware/inputValidator");
+// const { validateStation } = require("../middleware/inputValidator");
 
-router.post("/login", sationLogin);
-router.post("/logout", sationLogout);
-router.post("/signup", validateStation, createStation);
+router.post("/login", stationLogin);
+router.post("/logout", stationLogout);
+router.post("/signup", createStation);
 router.get("/", getAllStations);
 router.get("/:id", getStation);
 router.patch("/update/:id", updateStation);
