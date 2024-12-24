@@ -2,10 +2,8 @@ const express = require("express");
 const cors = require("cors");
 const connectDB = require("./config/db.js");
 const stationRouter = require("./routes/stationRoutes");
-
 const rateLimit = require("express-rate-limit");
 const helmet = require("helmet");
-
 const swaggerDocument = require("../swagger.json");
 const swaggerUi = require("swagger-ui-express");
 const globalErrorHandler = require("./controllers/errorController");
@@ -47,9 +45,10 @@ app.listen(PORT, () => {
   );
 });
 
+// Handle undefined routes
 app.all("*", (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 });
 
-// Error Handling
+// Error Handling Middleware
 app.use(globalErrorHandler);
