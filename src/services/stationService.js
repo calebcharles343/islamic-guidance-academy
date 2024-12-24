@@ -27,6 +27,10 @@ const createStationService = async (stationData, next) => {
   // Check if the station already exists
   const stationExists = await Station.findOne({ email: stationData.email });
 
+  // console.log(stationExists);
+
+  // return;
+
   if (stationExists) {
     return next(new AppError("Station already exists", 401)); // Exit early if station exists
   }
