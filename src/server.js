@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const connectDB = require("./config/db.js");
 const stationRouter = require("./routes/stationRoutes");
+const verificationRouter = require("./routes/verificationRoutes.js");
 const rateLimit = require("express-rate-limit");
 const helmet = require("helmet");
 const swaggerDocument = require("../swagger.json");
@@ -16,7 +17,8 @@ connectDB();
 
 // Middleware
 app.use(helmet());
-app.use(express.json({ limit: "10kb" }));
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(cors());
 
 // Limit requests from same API (bruteforce and denial of service attacks protection)
@@ -36,6 +38,7 @@ app.use(
 
 // Routes
 app.use("/api/v1/islamic-guidance-academy/stations", stationRouter);
+app.use("/api/v1/islamic-guidance-academy/verifications", verificationRouter);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
