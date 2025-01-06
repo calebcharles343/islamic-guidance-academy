@@ -19,16 +19,4 @@ router
   .patch(updateVerificationById)
   .delete(deleteVerificationById);
 
-/*
-  router
-  .route("/")
-  .get(protect, restrictTo("Admin"), getAllVerifications)
-  .post(protect, createVerification);
-
-router
-  .route("/:id")
-  .get(protect, getVerificationById)
-  .patch(protect, restrictTo("Admin"), updateVerificationById)
-  .delete(protect, restrictTo("Admin"), deleteVerificationById);
-*/
 module.exports = router;

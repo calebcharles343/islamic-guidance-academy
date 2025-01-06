@@ -33,7 +33,7 @@ const verificationSchema = new mongoose.Schema(
       type: String,
       required: [true, "Please provide your ethnic group"],
     },
-    stateOforigin: {
+    stateOfOrigin: {
       type: String,
       required: [true, "Please provide your state of origin"],
     },
@@ -61,12 +61,14 @@ const verificationSchema = new mongoose.Schema(
       ],
       minlength: 11,
       select: true,
+      unique: true,
     },
     bvn: {
       type: String,
       required: [true, "Please provide your BVN (Bank Verification Number)"],
       minlength: 11,
       select: true,
+      unique: true,
     },
 
     photo: { type: String },
