@@ -1,12 +1,16 @@
-const crypto = require("crypto");
 const mongoose = require("mongoose");
-const validator = require("validator");
-const bcrypt = require("bcryptjs");
-const { type } = require("os");
-const { string } = require("joi");
 
 const verificationSchema = new mongoose.Schema(
   {
+    station_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Station",
+      required: true,
+    },
+    station: {
+      type: String,
+      required: true,
+    },
     name: {
       type: String,
       required: [true, "Please provide your name"],
@@ -70,7 +74,6 @@ const verificationSchema = new mongoose.Schema(
       select: true,
       unique: true,
     },
-
     photo: { type: String },
   },
   {
@@ -78,43 +81,6 @@ const verificationSchema = new mongoose.Schema(
     collection: "verifications",
   }
 );
-
-// Pre-save middleware to hash password
-verificationSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
-
-  this.password = await bcrypt.hash(this.password, 12);
-  this.passwordConfirm = undefined;
-  next();
-});
-
-// Middleware to set passwordChangedAt
-verificationSchema.pre("save", function (next) {
-  if (!this.isModified("password") || this.isNew) return next();
-
-  this.passwordChangedAt = Date.now() - 1000;
-  next();
-});
-
-// Instance methods for password comparison and password changes
-verificationSchema.methods.correctPassword = async function (
-  candidatePassword,
-  userPassword
-) {
-  return await bcrypt.compare(candidatePassword, userPassword);
-};
-
-verificationSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
-  if (this.passwordChangedAt) {
-    const changedTimestamp = parseInt(
-      this.passwordChangedAt.getTime() / 1000,
-      10
-    );
-    return JWTTimestamp < changedTimestamp;
-  }
-
-  return false; // False means NOT changed
-};
 
 verificationSchema.set("toJSON", {
   virtuals: true,

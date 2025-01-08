@@ -2,12 +2,13 @@ const { promisify } = require("util");
 const catchAsync = require("../utils/catchAsync");
 const jwt = require("jsonwebtoken");
 
-const User = require("../models/User");
+const Station = require("../models/StationModel");
 const handleResponse = require("./handleResponse");
 
 const protect = catchAsync(async (req, res, next) => {
   // 1) Getting token and checking if it exists
   let token;
+
   if (
     req.headers.authorization &&
     req.headers.authorization.startsWith("Bearer")
@@ -27,14 +28,16 @@ const protect = catchAsync(async (req, res, next) => {
     return handleResponse(res, 401, "Token verification failed");
   }
 
-  // 3) Checking if the user still exists
-  const currentUser = await User.findById(decoded.id);
-  if (!currentUser) {
-    return handleResponse(res, 401, "User no longer exists");
+  // 3) Checking if the S still exists
+  const currentStation = await Station.findById(decoded.id);
+  if (!currentStation) {
+    return handleResponse(res, 401, "Station no longer exists");
   }
 
+  console.log(currentStation);
+
   // Granting access to the protected route
-  req.user = currentUser;
+  req.Station = currentStation;
 
   next();
 });

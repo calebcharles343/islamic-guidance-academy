@@ -6,11 +6,12 @@ const {
   deleteVerificationById,
   getAllVerifications,
 } = require("../controllers/verificationController");
-// const protect = require("../middleware/protect");
 // const restrictTo = require("../middleware/restrictTo");
+// const protect = require("../middleware/protect");
 
 const router = express.Router();
 
+// router.use(protect);
 router.route("/").get(getAllVerifications).post(createVerification);
 
 router

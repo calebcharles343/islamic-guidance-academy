@@ -1,30 +1,42 @@
-const verificationService = require("../services/verificationService");
+const {
+  getAllVerificationsService,
+  getVerificationByIdService,
+  updateVerificationByIdService,
+  deleteVerificationByIdService,
+  createVerificationService,
+} = require("../services/verificationService");
 const catchAsync = require("../utils/catchAsync");
 const handleResponse = require("../utils/handleResponse");
+const stationByToken = require("../utils/stationByToken");
 
 const createVerification = catchAsync(async (req, res, next) => {
   const { form, photo } = req.body;
+  const station = await stationByToken(req, res);
 
-  if (!photo) {
-    return handleResponse(res, 404, "Please provide your photo");
+  if (!station) {
+    return handleResponse(res, 401, "Invalid token");
   }
 
-  const verification = await verificationService.createVerification(
+  const station_id = station._id;
+  const stationNo = station.station;
+
+  const verification = await createVerificationService(
+    stationNo,
+    station_id,
     form,
     photo
   );
+
   handleResponse(res, 201, "Verification created successfully", verification);
 });
 
 const getVerificationById = catchAsync(async (req, res, next) => {
-  const verification = await verificationService.getVerificationById(
-    req.params.id
-  );
+  const verification = await getVerificationByIdService(req.params.id);
   handleResponse(res, 200, "Verification fetched successfully", verification);
 });
 
 const updateVerificationById = catchAsync(async (req, res, next) => {
-  const verification = await verificationService.updateVerificationById(
+  const verification = await updateVerificationByIdService(
     req.params.id,
     req.body
   );
@@ -32,12 +44,12 @@ const updateVerificationById = catchAsync(async (req, res, next) => {
 });
 
 const deleteVerificationById = catchAsync(async (req, res, next) => {
-  await verificationService.deleteVerificationById(req.params.id);
+  await deleteVerificationByIdService(req.params.id);
   handleResponse(res, 204, "Verification deleted successfully");
 });
 
 const getAllVerifications = catchAsync(async (req, res, next) => {
-  const verifications = await verificationService.getAllVerifications();
+  const verifications = await getAllVerificationsService();
   handleResponse(res, 200, "Verifications fetched successfully", verifications);
 });
 

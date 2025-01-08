@@ -1,11 +1,11 @@
 const {
-  getStationById,
+  getStationByIdService,
   getAllStationsService,
   createStationService,
   updateStationService,
   deleteStationService,
-  updateStationPassword,
-  stationLoginService, // Correct spelling
+  updateStationPasswordService,
+  stationLoginService,
 } = require("../services/stationService");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
@@ -14,14 +14,13 @@ const createSendToken = require("../utils/createSendToken");
 const handleResponse = require("../utils/handleResponse");
 
 const stationLogin = catchAsync(async (req, res, next) => {
-  // Correct spelling
   const { email, password } = req.body;
 
   if (!email || !password) {
     return handleResponse(res, 400, "Please provide both email and password");
   }
 
-  const station = await stationLoginService(email, password, next); // Correct spelling
+  const station = await stationLoginService(email, password, next);
 
   if (!station) {
     return handleResponse(res, 401, "Invalid credentials");
@@ -36,7 +35,6 @@ const stationLogin = catchAsync(async (req, res, next) => {
 });
 
 const stationLogout = catchAsync(async (req, res, next) => {
-  // Correct spelling
   res.cookie("jwt", "loggedout", {
     expires: new Date(Date.now() + 10 * 1000),
     httpOnly: true,
@@ -45,7 +43,7 @@ const stationLogout = catchAsync(async (req, res, next) => {
 });
 
 const getStation = catchAsync(async (req, res, next) => {
-  const station = await getStationById(req.params.id);
+  const station = await getStationByIdService(req.params.id);
   if (!station) {
     return handleResponse(res, 404, "Station not found");
   }
@@ -59,26 +57,22 @@ const getAllStations = catchAsync(async (req, res, next) => {
 });
 
 const createStation = catchAsync(async (req, res, next) => {
-  // Check if passwords match
   if (req.body.password !== req.body.passwordConfirm) {
     return handleResponse(res, 400, "Passwords do not match");
   }
 
-  // Call the service and handle the response
   const newStation = await createStationService(req.body, next);
 
-  // If `createStationService` calls `next`, execution won't reach here
   if (newStation) {
     handleResponse(res, 201, "Station Created", newStation);
   }
 });
 
 const updateStation = catchAsync(async (req, res, next) => {
-  // 1) Create error if user POSTs password data
   if (req.body.newPassword || req.body.password) {
     return next(
       new AppError(
-        "This route is not for password updates. Please use /updateStationPassword.",
+        "This route is not for password updates. Please use /updateStationPasswordService.",
         400
       )
     );
@@ -104,17 +98,20 @@ const changeStationPassword = catchAsync(async (req, res, next) => {
   const stationId = req.params.id;
   const { newPassword } = req.body;
 
-  const station = await getStationById(stationId);
+  const station = await getStationByIdService(stationId);
   if (!station) {
     return handleResponse(res, 404, "Station not found");
   }
-  const updatedStation = await updateStationPassword(stationId, newPassword);
+  const updatedStation = await updateStationPasswordService(
+    stationId,
+    newPassword
+  );
   handleResponse(res, 200, "Station password updated", updatedStation);
 });
 
 module.exports = {
-  stationLogin, // Correct spelling
-  stationLogout, // Correct spelling
+  stationLogin,
+  stationLogout,
   getStation,
   getAllStations,
   createStation,

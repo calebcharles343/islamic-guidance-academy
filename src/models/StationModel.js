@@ -1,4 +1,4 @@
-const crypto = require("crypto");
+"use strict";
 const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
@@ -9,7 +9,6 @@ const stationSchema = new mongoose.Schema(
       type: String,
       required: [true, "Please provide the station name"],
     },
-
     email: {
       type: String,
       required: [true, "Please provide your email"],
@@ -41,7 +40,6 @@ const stationSchema = new mongoose.Schema(
       type: String,
       required: [true, "Please confirm your password"],
       validate: {
-        // This only works on CREATE and SAVE!!!
         validator: function (el) {
           return el === this.password;
         },
@@ -53,10 +51,17 @@ const stationSchema = new mongoose.Schema(
   {
     timestamps: true,
     collection: "stations",
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   }
 );
 
-// Pre-save middleware to hash password
+stationSchema.virtual("verifications", {
+  ref: "Verification",
+  localField: "_id",
+  foreignField: "station_id",
+});
+
 stationSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
 
@@ -65,7 +70,6 @@ stationSchema.pre("save", async function (next) {
   next();
 });
 
-// Middleware to set passwordChangedAt
 stationSchema.pre("save", function (next) {
   if (!this.isModified("password") || this.isNew) return next();
 
@@ -73,7 +77,6 @@ stationSchema.pre("save", function (next) {
   next();
 });
 
-// Instance methods for password comparison and password changes
 stationSchema.methods.correctPassword = async function (
   candidatePassword,
   userPassword
@@ -101,6 +104,7 @@ stationSchema.set("toJSON", {
     delete returnedObject.__v;
   },
 });
+
 const Station = mongoose.model("Station", stationSchema);
 
 module.exports = Station;

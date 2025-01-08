@@ -1,4 +1,5 @@
 const Station = require("../models/StationModel");
+
 const comparePasswords = require("../utils/comparePasswords");
 const AppError = require("../utils/appError");
 
@@ -13,11 +14,10 @@ const stationLoginService = async (email, password, next) => {
   return station;
 };
 
-const getStationById = async (stationId) => {
+const getStationByIdService = async (stationId) => {
   const station = await Station.findById(stationId);
   return station;
 };
-
 const getAllStationsService = async () => {
   const stations = await Station.find();
   return stations;
@@ -26,10 +26,6 @@ const getAllStationsService = async () => {
 const createStationService = async (stationData, next) => {
   // Check if the station already exists
   const stationExists = await Station.findOne({ email: stationData.email });
-
-  // console.log(stationExists);
-
-  // return;
 
   if (stationExists) {
     return next(new AppError("Station already exists", 401)); // Exit early if station exists
@@ -56,7 +52,7 @@ const deleteStationService = async (stationId) => {
   return deletedStation;
 };
 
-const updateStationPassword = async (stationId, newPassword) => {
+const updateStationPasswordService = async (stationId, newPassword) => {
   const station = await Station.findById(stationId);
   if (!station) {
     throw new Error("Station not found");
@@ -69,10 +65,10 @@ const updateStationPassword = async (stationId, newPassword) => {
 
 module.exports = {
   stationLoginService, // Correct spelling
-  getStationById,
+  getStationByIdService,
   getAllStationsService,
   createStationService,
   updateStationService,
   deleteStationService,
-  updateStationPassword,
+  updateStationPasswordService,
 };

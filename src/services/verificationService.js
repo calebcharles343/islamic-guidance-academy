@@ -2,7 +2,7 @@ const Verification = require("../models/VerificationModel.js");
 const AppError = require("../utils/appError");
 const { cloudinary } = require("../utils/cloudinary.js");
 
-const createVerification = async (form, photo) => {
+const createVerificationService = async (station, station_id, form, photo) => {
   // Ensure folder name is safe (replace spaces or special characters)
   const folderName = form.name
     .replace(/\s+/g, "_")
@@ -17,22 +17,28 @@ const createVerification = async (form, photo) => {
     ],
   });
 
-  const data = { ...form, photo: uploadedResponse.url };
+  const data = { station, station_id, ...form, photo: uploadedResponse.url };
 
   const verification = await Verification.create(data);
 
   return { verification, uploadedResponse };
 };
 
-const getVerificationById = async (id) => {
-  const verification = await Verification.findById(id);
+const getVerificationByIdService = async (verificationId) => {
+  const verification = await Verification.findById(verificationId);
+
   if (!verification) {
     throw new AppError(`Verification with ID ${id} not found`, 404);
   }
   return verification;
 };
 
-const updateVerificationById = async (id, data) => {
+const getAllVerificationsService = async () => {
+  const verifications = await Verification.find();
+  return verifications;
+};
+
+const updateVerificationByIdService = async (id, data) => {
   const verification = await Verification.findByIdAndUpdate(id, data, {
     new: true,
     runValidators: true,
@@ -43,7 +49,7 @@ const updateVerificationById = async (id, data) => {
   return verification;
 };
 
-const deleteVerificationById = async (id) => {
+const deleteVerificationByIdService = async (id) => {
   const verification = await Verification.findByIdAndDelete(id);
   if (!verification) {
     throw new AppError(`Verification with ID ${id} not found`, 404);
@@ -51,15 +57,10 @@ const deleteVerificationById = async (id) => {
   return verification;
 };
 
-const getAllVerifications = async () => {
-  const verifications = await Verification.find();
-  return verifications;
-};
-
 module.exports = {
-  createVerification,
-  getVerificationById,
-  updateVerificationById,
-  deleteVerificationById,
-  getAllVerifications,
+  createVerificationService,
+  getVerificationByIdService,
+  updateVerificationByIdService,
+  deleteVerificationByIdService,
+  getAllVerificationsService,
 };
