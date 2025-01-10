@@ -18,10 +18,12 @@ const verificationSchema = new mongoose.Schema(
     mrn: {
       type: String,
       required: [true, "Please provide the MRN"],
+      unique: true,
     },
     fileNumber: {
       type: String,
       required: [true, "Please provide the file number"],
+      unique: true,
     },
     dateOfBirth: {
       type: String,
@@ -32,6 +34,7 @@ const verificationSchema = new mongoose.Schema(
       required: [true, "Please provide a phone number"],
       minlength: 11,
       select: true,
+      unique: true,
     },
     ethnicGroup: {
       type: String,
