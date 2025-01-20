@@ -22,19 +22,19 @@ const stationSchema = new mongoose.Schema(
     },
     station: {
       type: String,
-      enum: ["63Kw-1446-2401", "63Oy-1446-2401"],
+      enum: ["NGKW-1446-2401", "NGOY-1446-2401"],
+      select: true,
     },
     phone: {
       type: String,
       required: [true, "Please provide a phone number"],
       minlength: 11,
-      select: true,
     },
+
     password: {
       type: String,
       required: [true, "Please provide a password"],
       minlength: 8,
-      select: false,
     },
     passwordConfirm: {
       type: String,
