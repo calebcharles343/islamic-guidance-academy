@@ -15,7 +15,7 @@ const verificationSchema = new mongoose.Schema(
       type: String,
       required: [true, "Please provide your name"],
     },
-    drn: {
+    mrn: {
       type: String,
       required: [true, "Please provide the MRN"],
       unique: true,
