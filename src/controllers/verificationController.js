@@ -36,9 +36,12 @@ const getVerificationById = catchAsync(async (req, res, next) => {
 });
 
 const updateVerificationById = catchAsync(async (req, res, next) => {
+  const { form, photo } = req.body;
+
   const verification = await updateVerificationByIdService(
     req.params.id,
-    req.body
+    form,
+    photo
   );
   handleResponse(res, 200, "Verification updated successfully", verification);
 });
