@@ -17,7 +17,7 @@ const protect = require("../middleware/protect");
 router.post("/login", stationLogin);
 router.post("/logout", stationLogout);
 router.post("/signup", createStation);
-router.get("/", protect, getAllStations);
+router.get("/", getAllStations);
 router.get("/:id", getStation);
 router.patch("/update/:id", updateStation);
 router.delete("/delete/:id", deleteStation);
