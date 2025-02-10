@@ -69,14 +69,14 @@ const createStation = catchAsync(async (req, res, next) => {
 });
 
 const updateStation = catchAsync(async (req, res, next) => {
-  if (req.body.newPassword || req.body.password) {
-    return next(
-      new AppError(
-        "This route is not for password updates. Please use /updateStationPasswordService.",
-        400
-      )
-    );
-  }
+  // if (req.body.newPassword || req.body.password) {
+  //   return next(
+  //     new AppError(
+  //       "This route is not for password updates. Please use /updateStationPasswordService.",
+  //       400
+  //     )
+  //   );
+  // }
 
   const updatedStation = await updateStationService(req.params.id, req.body);
   if (!updatedStation) {

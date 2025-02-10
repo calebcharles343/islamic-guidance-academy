@@ -7,6 +7,8 @@ const stationLoginService = async (email, password, next) => {
   // Correct spelling
   const station = await Station.findOne({ email }).select("+password");
 
+  console.log(station.password, "xxxx");
+
   if (!station || !(await comparePasswords(password, station.password))) {
     return next(new AppError("Incorrect email or password", 401));
   }
