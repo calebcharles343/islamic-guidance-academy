@@ -67,7 +67,10 @@ const updateStationPasswordService = async (stationId, newPassword) => {
   }
   station.password = newPassword;
   station.passwordConfirm = newPassword;
-  await station.save();
+
+  // Save the password without validating required fields
+  await station.save({ validateBeforeSave: false });
+
   return station;
 };
 

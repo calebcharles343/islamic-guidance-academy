@@ -69,7 +69,6 @@ const createStation = catchAsync(async (req, res, next) => {
 });
 
 const updateStation = catchAsync(async (req, res, next) => {
-  
   const updatedStation = await updateStationService(req.params.id, req.body);
 
   if (!updatedStation) {
@@ -89,20 +88,20 @@ const deleteStation = catchAsync(async (req, res, next) => {
 
 const changeStationPassword = catchAsync(async (req, res, next) => {
   const stationId = req.params.id;
-  const { newPassword, confirmnewPassword } = req.body;
+  const { password, passwordConfirm } = req.body;
 
   const station = await getStationByIdService(stationId);
   if (!station) {
     return handleResponse(res, 404, "Station not found");
   }
 
-  if (newPassword !== confirmnewPassword) {
+  if (password !== passwordConfirm) {
     return handleResponse(res, 404, "Station not found");
   }
 
   const updatedStation = await updateStationPasswordService(
     stationId,
-    newPassword
+    password
   );
   handleResponse(res, 200, "Station password updated", updatedStation);
 });
