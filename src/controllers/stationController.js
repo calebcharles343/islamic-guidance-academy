@@ -69,16 +69,9 @@ const createStation = catchAsync(async (req, res, next) => {
 });
 
 const updateStation = catchAsync(async (req, res, next) => {
-  // if (req.body.newPassword || req.body.password) {
-  //   return next(
-  //     new AppError(
-  //       "This route is not for password updates. Please use /updateStationPasswordService.",
-  //       400
-  //     )
-  //   );
-  // }
-
+  
   const updatedStation = await updateStationService(req.params.id, req.body);
+
   if (!updatedStation) {
     return handleResponse(res, 404, "Station not found");
   }
@@ -96,12 +89,17 @@ const deleteStation = catchAsync(async (req, res, next) => {
 
 const changeStationPassword = catchAsync(async (req, res, next) => {
   const stationId = req.params.id;
-  const { newPassword } = req.body;
+  const { newPassword, confirmnewPassword } = req.body;
 
   const station = await getStationByIdService(stationId);
   if (!station) {
     return handleResponse(res, 404, "Station not found");
   }
+
+  if (newPassword !== confirmnewPassword) {
+    return handleResponse(res, 404, "Station not found");
+  }
+
   const updatedStation = await updateStationPasswordService(
     stationId,
     newPassword

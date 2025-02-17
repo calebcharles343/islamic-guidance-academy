@@ -7,7 +7,7 @@ const stationLoginService = async (email, password, next) => {
   // Correct spelling
   const station = await Station.findOne({ email }).select("+password");
 
-  console.log(station.password, "xxxx");
+  console.log(station.password, password, "xxxx");
 
   if (!station || !(await comparePasswords(password, station.password))) {
     return next(new AppError("Incorrect email or password", 401));
@@ -41,11 +41,17 @@ const createStationService = async (stationData, next) => {
 };
 
 const updateStationService = async (stationId, updateData) => {
+  const station = await Station.findById(stationId);
+  if (!station) {
+    throw new Error("Station not found");
+  }
+
   const updatedStation = await Station.findByIdAndUpdate(
     stationId,
     updateData,
-    { new: true }
+    { new: true, runValidators: true }
   );
+
   return updatedStation;
 };
 
