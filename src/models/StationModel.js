@@ -25,6 +25,12 @@ const stationSchema = new mongoose.Schema(
       enum: ["NGKW-1446-2401", "NGOY-1446-2401"],
       select: true,
     },
+
+    department: {
+      type: String,
+      required: true,
+    },
+
     drn: {
       type: String,
       required: [true, "Please provide the MRN"],
