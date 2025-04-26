@@ -3,6 +3,7 @@ const cors = require("cors");
 const connectDB = require("./config/db.js");
 const stationRouter = require("./routes/stationRoutes");
 const verificationRouter = require("./routes/verificationRoutes.js");
+const fileGeneratorRouter = require("./routes/fileGeneratorRoutes.js");
 const rateLimit = require("express-rate-limit");
 const helmet = require("helmet");
 const swaggerDocument = require("../swagger.json");
@@ -23,11 +24,11 @@ app.use(cors());
 
 // Limit requests from same API (bruteforce and denial of service attacks protection)
 const limiter = rateLimit({
-  max: 2000,
-  windowMs: 0.5 * 0.5 * 1000,
+  max: 100,
+  windowMs: 60 * 60 * 1000,
   message: "Too many requests from this IP, please try again in an hour!",
 });
-// app.use("/api", limiter);
+app.use("/api", limiter);
 
 // Swagger Documentation
 app.use(
@@ -39,6 +40,10 @@ app.use(
 // Routes
 app.use("/api/v1/islamic-guidance-academy/stations", stationRouter);
 app.use("/api/v1/islamic-guidance-academy/verifications", verificationRouter);
+app.use(
+  "/api/v1/islamic-guidance-academy/file-generators",
+  fileGeneratorRouter
+);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
