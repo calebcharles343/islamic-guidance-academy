@@ -19,7 +19,7 @@ const fileGeneratorSchema = new mongoose.Schema(
       required: [true, "Please provide your state of origin"],
     },
 
-    community: {
+    religion: {
       type: String,
       required: [true, "Please provide community name"],
       enum: ["M0", "M1", "M2"],

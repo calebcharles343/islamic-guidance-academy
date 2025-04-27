@@ -1,77 +1,36 @@
 const fileGeneratorService = require("../services/fileGeneratorService");
+const catchAsync = require("../utils/catchAsync");
+const handleResponse = require("../utils/handleResponse");
 
-const createFile = async (req, res, next) => {
-  try {
-    const file = await fileGeneratorService.createFile(req.body);
-    res.status(201).json({
-      success: true,
-      data: file,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+const createFile = catchAsync(async (req, res, next) => {
+  const file = await fileGeneratorService.createFile(req.body);
+  handleResponse(res, 201, "success", file);
+});
 
-const getAllFiles = async (req, res, next) => {
-  try {
-    const files = await fileGeneratorService.getAllFiles();
-    res.status(200).json({
-      success: true,
-      data: files,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+const getAllFiles = catchAsync(async (req, res, next) => {
+  const files = await fileGeneratorService.getAllFiles();
+  handleResponse(res, 200, "success", files);
+});
 
-const getFileById = async (req, res, next) => {
-  try {
-    const file = await fileGeneratorService.getFileById(req.params.id);
-    res.status(200).json({
-      success: true,
-      data: file,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+const getFileById = catchAsync(async (req, res, next) => {
+  const file = await fileGeneratorService.getFileById(req.params.id);
+  handleResponse(res, 200, "success", file);
+});
 
-const updateFile = async (req, res, next) => {
-  try {
-    const file = await fileGeneratorService.updateFile(req.params.id, req.body);
-    res.status(200).json({
-      success: true,
-      data: file,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+const updateFile = catchAsync(async (req, res, next) => {
+  const file = await fileGeneratorService.updateFile(req.params.id, req.body);
+  handleResponse(res, 200, "success", file);
+});
 
-const deleteFile = async (req, res, next) => {
-  try {
-    await fileGeneratorService.deleteFile(req.params.id);
-    res.status(200).json({
-      success: true,
-      data: null,
-      message: "File deleted successfully",
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+const deleteFile = catchAsync(async (req, res, next) => {
+  await fileGeneratorService.deleteFile(req.params.id);
+  handleResponse(res, 200, "File deleted successfully");
+});
 
-const getFileByMrn = async (req, res, next) => {
-  try {
-    const file = await fileGeneratorService.getFileByMrn(req.params.mrn);
-    res.status(200).json({
-      success: true,
-      data: file,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+const getFileByMrn = catchAsync(async (req, res, next) => {
+  const file = await fileGeneratorService.getFileByMrn(req.params.mrn);
+  handleResponse(res, 200, "success", file);
+});
 
 module.exports = {
   createFile,
