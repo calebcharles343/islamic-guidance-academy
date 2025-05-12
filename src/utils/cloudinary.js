@@ -8,38 +8,80 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET, // Click 'View API Keys' above to copy your API secret
 });
 
-// (async function () {
-//   // Upload an image
-//   const uploadResult = await cloudinary.uploader
-//     .upload(
-//       "https://res.cloudinary.com/demo/image/upload/getting-started/shoes.jpg",
-//       {
-//         public_id: "shoes",
-//       }
-//     )
-//     .catch((error) => {
-//       console.log(error);
-//     });
+/**
+ * Get folder path based on file type
+ * This organizes files in Cloudinary by type
+ */
+const getFolderByFileType = (fileType) => {
+  switch (fileType) {
+    case "image/jpeg":
+    case "image/png":
+    case "image/gif":
+    case "image/webp":
+      return "images";
+    case "application/pdf":
+      return "pdfs";
+    case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+    case "application/vnd.ms-excel":
+      return "spreadsheets";
+    case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+    case "application/msword":
+      return "documents";
+    default:
+      return "other";
+  }
+};
 
-//   console.log(uploadResult);
+/**
+ * Map MIME type to our file type categories
+ */
+const getFileTypeFromMimeType = (mimeType) => {
+  if (mimeType.startsWith("image/")) return "image";
+  if (mimeType === "application/pdf") return "pdf";
+  if (mimeType.includes("spreadsheet") || mimeType.includes("excel"))
+    return "spreadsheet";
+  if (mimeType.includes("document") || mimeType.includes("word"))
+    return "document";
+  return "other";
+};
 
-//   // Optimize delivery by resizing and applying auto-format and auto-quality
-//   const optimizeUrl = cloudinary.url("shoes", {
-//     fetch_format: "auto",
-//     quality: "auto",
-//   });
+/**
+ * Direct Cloudinary upload function (without multer)
+ * This allows us to upload file buffers directly to Cloudinary
+ */
+const uploadToCloudinary = async (buffer, options = {}) => {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      options,
+      (error, result) => {
+        if (error) return reject(error);
+        resolve(result);
+      }
+    );
 
-//   console.log(optimizeUrl);
+    // Convert buffer to stream and pipe to uploadStream
+    streamifier.createReadStream(buffer).pipe(uploadStream);
+  });
+};
 
-//   // Transform the image: auto-crop to square aspect_ratio
-//   const autoCropUrl = cloudinary.url("shoes", {
-//     crop: "auto",
-//     gravity: "auto",
-//     width: 500,
-//     height: 500,
-//   });
+/**
+ * Delete a file from Cloudinary by its public ID
+ */
+const deleteFromCloudinary = async (publicId) => {
+  try {
+    const result = await cloudinary.uploader.destroy(publicId);
+    return result;
+  } catch (error) {
+    console.error(`❌ Cloudinary deletion failed:`, error);
+  }
+};
 
-//   console.log(autoCropUrl);
-// })();
+module.exports = {
+  cloudinary,
+  uploadToCloudinary,
+  deleteFromCloudinary,
+  getFolderByFileType,
+  getFileTypeFromMimeType,
+};
 
-module.exports = { cloudinary };
+// module.exports = { cloudinary };

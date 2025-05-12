@@ -21,7 +21,7 @@ const fileGeneratorSchema = new mongoose.Schema(
 
     religion: {
       type: String,
-      required: [true, "Please provide community name"],
+      required: [true, "Please provide religion name"],
       enum: ["M0", "M1", "M2"],
       select: true,
     },
@@ -41,7 +41,6 @@ const fileGeneratorSchema = new mongoose.Schema(
     nationality: {
       type: String,
       required: [true, "Please provide your Nationality"],
-      unique: true,
     },
 
     ethnicGroup: {
