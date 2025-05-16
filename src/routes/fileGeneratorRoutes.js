@@ -1,9 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const fileGeneratorController = require("../controllers/fileGeneratorController");
+const { upload } = require("../controllers/fileController");
 
 // Create a new FileGenerator
-router.post("/", fileGeneratorController.createFile);
+router.post("/", upload.array("files", 10), fileGeneratorController.createFile);
 
 // Get all FileGenerators
 router.get("/", fileGeneratorController.getAllFiles);

@@ -1,4 +1,5 @@
 const File = require("../models/FileGenerator");
+const fileService = require("./fileService");
 
 const getNextFileNumber = async (statePrefix) => {
   // Find all files with this state prefix
@@ -23,7 +24,8 @@ const getNextMRN = async (religionCode) => {
     .limit(1);
 
   const currentYear = new Date().getFullYear();
-  const yearPart = (currentYear - 578).toString(); // Islamic calendar
+  // const yearPart = (currentYear - 578).toString(); // Islamic calendar
+  const yearPart = (currentYear - 579).toString(); // Islamic calendar
 
   if (files.length === 0) return `m263-${yearPart}-2501${religionCode}`;
 
@@ -34,11 +36,11 @@ const getNextMRN = async (religionCode) => {
   return `m263-${yearPart}-${lastSequence + 1}${religionCode}`;
 };
 
-createFile = async (data) => {
+createFile = async (data, files = []) => {
   const statePrefix = data.stateOfOrigin.substring(0, 3).toUpperCase();
   const fileNumber = await getNextFileNumber(statePrefix);
 
-  const religionCode = data.religion; // Assuming this is M0, M1, or M2
+  const religionCode = data.religion;
   const mrn = await getNextMRN(religionCode);
 
   const fileData = {
@@ -47,13 +49,50 @@ createFile = async (data) => {
     mrn,
   };
 
-  return File.create(fileData);
+  // First create the file document
+  const createdFile = await File.create(fileData);
+
+  // Then handle file uploads if needed
+  if (files.length > 0) {
+    const uploadedFiles = await Promise.all(
+      files.map((file) =>
+        fileService.uploadFile({
+          buffer: file.buffer,
+          originalname: file.originalname,
+          mimetype: file.mimetype,
+          size: file.size,
+        })
+      )
+    );
+
+    await Promise.all(
+      uploadedFiles.map((file) =>
+        fileService.associateFile(file._id, "FileGenerators", createdFile._id)
+      )
+    );
+  }
+
+  return createdFile;
 };
 
 const getAllFiles = async () => {
   try {
-    const files = await File.find({});
-    return files;
+    const filesGens = await File.find({});
+
+    const fileGenWithFiles = await Promise.all(
+      filesGens.map(async (file) => {
+        const files = await fileService.getFilesByDocument(
+          "FileGenerators",
+          file._id
+        );
+        return {
+          ...file.toJSON(),
+          files,
+        };
+      })
+    );
+
+    return { files: fileGenWithFiles };
   } catch (error) {
     throw new Error(error.message);
   }

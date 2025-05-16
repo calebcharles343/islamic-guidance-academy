@@ -3,7 +3,8 @@ const catchAsync = require("../utils/catchAsync");
 const handleResponse = require("../utils/handleResponse");
 
 const createFile = catchAsync(async (req, res, next) => {
-  const file = await fileGeneratorService.createFile(req.body);
+  const files = req.files || [];
+  const file = await fileGeneratorService.createFile(req.body, files);
   handleResponse(res, 201, "success", file);
 });
 
