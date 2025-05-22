@@ -2,7 +2,7 @@ const { MongoClient } = require("mongodb");
 
 async function recoverWithStableConnection() {
   const uri =
-    "mongodb+srv://murshidu075:Olayiwola555314@cluster0.f7kpb.mongodb.net/IslamicGuidance?retryWrites=true&w=majority&appName=Cluster0";
+    "xxx";
 
   const client = new MongoClient(uri, {
     connectTimeoutMS: 60000,
