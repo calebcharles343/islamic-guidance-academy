@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const fileGeneratorSchema = new mongoose.Schema(
+const mrnSchema = new mongoose.Schema(
   {
     firstName: {
       type: String,
@@ -17,6 +17,11 @@ const fileGeneratorSchema = new mongoose.Schema(
     stateOfOrigin: {
       type: String,
       required: [true, "Please provide your state of origin"],
+    },
+
+    dateOfBirth: {
+      type: String,
+      required: [true, "Please provide your date of birth"],
     },
 
     religion: {
@@ -61,7 +66,7 @@ const fileGeneratorSchema = new mongoose.Schema(
   }
 );
 
-fileGeneratorSchema.set("toJSON", {
+mrnSchema.set("toJSON", {
   virtuals: true,
   transform: (document, returnedObject) => {
     returnedObject.id = returnedObject._id.toString();
@@ -70,6 +75,6 @@ fileGeneratorSchema.set("toJSON", {
   },
 });
 
-const FileGenerator = mongoose.model("FileGenerator", fileGeneratorSchema);
+const mrn = mongoose.model("Mrn", mrnSchema);
 
-module.exports = FileGenerator;
+module.exports = mrn;
