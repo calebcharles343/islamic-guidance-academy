@@ -31,6 +31,11 @@ const mrnSchema = new mongoose.Schema(
       select: true,
     },
 
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
+
     mrn: {
       type: String,
       required: [true, "Please provide the MRN"],
