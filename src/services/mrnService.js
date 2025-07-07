@@ -57,18 +57,18 @@ const createMRN = async (data, files = []) => {
     };
 
     // First create the file document
-    const createdFile = await mrnModel.create(fileData);
+    const createdMrn = await mrnModel.create(fileData);
 
     // Then handle file uploads if needed
     if (files.length > 0) {
       await handleFileUploads({
         files,
-        documentId: mrn._id,
+        documentId: createdMrn._id,
         modelTable: "Mrns",
       });
     }
 
-    return createdFile;
+    return createdMrn;
   } catch (error) {
     throw new Error(`Error creating file: ${error.message}`);
   }
