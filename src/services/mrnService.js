@@ -1,65 +1,82 @@
 const mrnModel = require("../models/Mrn");
 const handleFileUploads = require("../utils/FileUploads");
 const fileService = require("./fileService");
+const moment = require("moment-hijri");
+
+// Cache for last file numbers to reduce database queries
+const fileNumberCache = new Map();
 
 const getNextFileNumber = async (statePrefix) => {
   try {
-    const mrns = await mrnModel
-      .find({
-        fileNumber: new RegExp(`^${statePrefix}\\d+$`),
-      })
-      .sort({ fileNumber: -1 })
-      .limit(1);
+    // Check cache first
+    if (fileNumberCache.has(statePrefix)) {
+      const lastNumber = fileNumberCache.get(statePrefix);
+      const nextNumber = lastNumber + 1;
+      fileNumberCache.set(statePrefix, nextNumber);
+      return `${statePrefix}${nextNumber.toString().padStart(2, "0")}`;
+    }
 
-    if (mrns.length === 0) return `${statePrefix}01`;
+    const mrn = await mrnModel.findOne(
+      { fileNumber: new RegExp(`^${statePrefix}\\d+$`) },
+      { fileNumber: 1 },
+      { sort: { fileNumber: -1 } }
+    );
 
-    const lastNumber = parseInt(mrns[0].fileNumber.replace(statePrefix, ""));
+    if (!mrn) {
+      fileNumberCache.set(statePrefix, 1);
+      return `${statePrefix}01`;
+    }
+
+    const lastNumber = parseInt(mrn.fileNumber.replace(statePrefix, ""), 10);
+    fileNumberCache.set(statePrefix, lastNumber + 1);
     return `${statePrefix}${(lastNumber + 1).toString().padStart(2, "0")}`;
   } catch (error) {
     throw new Error(`Error getting next file number: ${error.message}`);
   }
 };
 
-const getNextMRN = async () => {
+const getNextMRN = async (religion) => {
   try {
-    const mrns = await mrnModel
-      .find({
-        mrn: new RegExp(`^m263-\\d+-\\d+$`), // Match format without religion code
-      })
-      .sort({ mrn: -1 })
-      .limit(1);
+    const hijriYear = moment().iYear();
+    const yy = new Date().getFullYear().toString().slice(-2);
+    const prefix = `${religion}63-${hijriYear}-${yy}`;
 
-    const currentYear = new Date().getFullYear();
-    const yearPart = (currentYear - 579).toString(); // Islamic calendar
+    // More efficient query using $regex and projection
+    const lastMRN = await mrnModel.findOne(
+      { mrn: new RegExp(`^${prefix}\\d{2}$`) },
+      { mrn: 1 },
+      { sort: { mrn: -1 } }
+    );
 
-    if (mrns.length === 0) return `m263-${yearPart}-2501`;
+    let sequenceNumber;
+    if (!lastMRN) {
+      sequenceNumber = 1;
+    } else {
+      sequenceNumber = parseInt(lastMRN.mrn.slice(-2), 10) + 1;
+    }
 
-    const lastMRN = mrns[0].mrn;
-    const lastSequence = parseInt(lastMRN.split("-")[2]);
-    return `m263-${yearPart}-${(lastSequence + 1).toString().padStart(4, "0")}`;
+    return `${prefix}${sequenceNumber.toString().padStart(2, "0")}`;
   } catch (error) {
-    throw new Error(`Error getting next MRN: ${error.message}`);
+    throw new Error(`Error generating next MRN: ${error.message}`);
   }
 };
 
 const createMRN = async (data, files = []) => {
   try {
     const statePrefix = data.stateOfOrigin.substring(0, 3).toUpperCase();
-    const fileNumber = await getNextFileNumber(statePrefix);
-
-    // const religionCode = data.religion;
-    const mrn = await getNextMRN();
+    const [fileNumber, mrn] = await Promise.all([
+      getNextFileNumber(statePrefix),
+      getNextMRN(data.religion),
+    ]);
 
     const fileData = {
       ...data,
       fileNumber,
-      mrn, // Using lowercase to match model
+      mrn,
     };
 
-    // First create the file document
     const createdMrn = await mrnModel.create(fileData);
 
-    // Then handle file uploads if needed
     if (files.length > 0) {
       await handleFileUploads({
         files,
@@ -74,18 +91,25 @@ const createMRN = async (data, files = []) => {
   }
 };
 
-const getAllMRNs = async () => {
+const getAllMRNs = async (projection = null) => {
   try {
-    const mrns = await mrnModel.find({});
+    const mrns = await mrnModel.find({}, projection);
+
+    // Only fetch files if no projection or if projection includes files
+    const shouldFetchFiles =
+      !projection ||
+      (typeof projection === "object" &&
+        !Object.keys(projection).some((k) => projection[k] === 0));
+
+    if (!shouldFetchFiles) {
+      return { files: mrns };
+    }
 
     const mrnsWithFiles = await Promise.all(
-      mrns.map(async (mrn) => {
-        const files = await fileService.getFilesByDocument("Mrns", mrn._id);
-        return {
-          ...mrn.toJSON(),
-          files,
-        };
-      })
+      mrns.map(async (mrn) => ({
+        ...mrn.toJSON(),
+        files: await fileService.getFilesByDocument("Mrns", mrn._id),
+      }))
     );
 
     return { files: mrnsWithFiles };
@@ -94,9 +118,9 @@ const getAllMRNs = async () => {
   }
 };
 
-const getMRNById = async (id) => {
+const getMRNById = async (id, projection = null) => {
   try {
-    const mrn = await mrnModel.findById(id);
+    const mrn = await mrnModel.findById(id, projection);
     if (!mrn) {
       throw new Error("MRN not found");
     }
@@ -106,75 +130,37 @@ const getMRNById = async (id) => {
   }
 };
 
-// const updateMRN = async (id, data, files = []) => {
-//   try {
-//     // Prevent MRN and fileNumber from being updated
-//     const { mrn, fileNumber, ...updateData } = data;
-
-//     const updatedMRN = await mrnModel.findByIdAndUpdate(id, updateData, {
-//       new: true,
-//       runValidators: true,
-//     });
-
-//     if (!updatedMRN) {
-//       throw new Error("MRN not found");
-//     }
-
-//     if (files.length > 0) {
-//       await handleFileUploads({
-//         files,
-//         documentId: updatedMRN._id,
-//         modelTable: "Mrns",
-//       });
-//     }
-
-//     return updatedMRN;
-//   } catch (error) {
-//     throw new Error(`Error updating MRN: ${error.message}`);
-//   }
-// };
-
 const updateMRN = async (id, data, files = []) => {
   try {
-    // First get the existing MRN
     const existingMRN = await mrnModel.findById(id);
     if (!existingMRN) {
       throw new Error("MRN not found");
     }
 
-    // Determine if we need to generate a new MRN
-    let mrn = existingMRN.mrn;
-    let fileNumber = existingMRN.fileNumber;
+    let { mrn, fileNumber } = existingMRN;
+    const updates = { ...data };
 
-    // If state of origin changed, generate new file number
+    // Only update fileNumber if stateOfOrigin changed
     if (
       data.stateOfOrigin &&
       data.stateOfOrigin !== existingMRN.stateOfOrigin
     ) {
       const statePrefix = data.stateOfOrigin.substring(0, 3).toUpperCase();
       fileNumber = await getNextFileNumber(statePrefix);
+      updates.fileNumber = fileNumber;
     }
 
-    // If religion changed or we want to regenerate MRN for some reason
-    // Note: Typically MRNs shouldn't change, so this might be conditional
+    // Only update MRN if religion changed
     if (data.religion && data.religion !== existingMRN.religion) {
-      mrn = await getNextMRN();
+      mrn = await getNextMRN(data.religion);
+      updates.mrn = mrn;
     }
 
-    // Prepare update data
-    const updateData = {
-      ...data,
-      ...(fileNumber !== existingMRN.fileNumber && { fileNumber }),
-      ...(mrn !== existingMRN.mrn && { mrn }),
-    };
-
-    // Perform the update
-    const updatedMRN = await mrnModel.findByIdAndUpdate(id, updateData, {
+    const updatedMRN = await mrnModel.findByIdAndUpdate(id, updates, {
       new: true,
       runValidators: true,
     });
 
-    // Handle file uploads if any
     if (files.length > 0) {
       await handleFileUploads({
         files,
@@ -188,13 +174,16 @@ const updateMRN = async (id, data, files = []) => {
     throw new Error(`Error updating MRN: ${error.message}`);
   }
 };
+
 const deleteMRN = async (id) => {
   try {
     const mrn = await mrnModel.findByIdAndDelete(id);
     if (!mrn) {
       throw new Error("MRN not found");
     }
-    fileService.deleteFilesByDocument("Mrns", id);
+
+    // Fire and forget file deletion
+    fileService.deleteFilesByDocument("Mrns", id).catch(console.error);
 
     return mrn;
   } catch (error) {
@@ -202,9 +191,9 @@ const deleteMRN = async (id) => {
   }
 };
 
-const getByMRN = async (mrnNumber) => {
+const getByMRN = async (mrnNumber, projection = null) => {
   try {
-    const mrn = await mrnModel.findOne({ mrn: mrnNumber });
+    const mrn = await mrnModel.findOne({ mrn: mrnNumber }, projection);
     if (!mrn) {
       throw new Error("MRN not found with this number");
     }
