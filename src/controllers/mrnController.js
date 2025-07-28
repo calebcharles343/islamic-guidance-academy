@@ -1,10 +1,12 @@
 const mrnService = require("../services/mrnService");
 const catchAsync = require("../utils/catchAsync");
+const userByToken = require("../middleware/userByToken");
 const handleResponse = require("../utils/handleResponse");
 
 const createMRN = catchAsync(async (req, res, next) => {
   const files = req.files || [];
-  const file = await mrnService.createMRN(req.body, files);
+  const user = await userByToken(req, res);
+  const file = await mrnService.createMRN(user, req.body, files);
   handleResponse(res, 201, "success", file);
 });
 

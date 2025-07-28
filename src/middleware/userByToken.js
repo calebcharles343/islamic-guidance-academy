@@ -1,6 +1,6 @@
 const { promisify } = require("util");
 const handleResponse = require("./handleResponse");
-const User = require("../models/User");
+const User = require("../models/StationModel");
 const jwt = require("jsonwebtoken");
 
 const userByToken = async (req, res) => {

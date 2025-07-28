@@ -65,7 +65,14 @@ const mrnSchema = new mongoose.Schema(
       select: true,
       unique: true,
     },
+
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Station",
+      required: true,
+    },
   },
+
   {
     timestamps: true,
   }

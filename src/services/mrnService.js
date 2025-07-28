@@ -61,7 +61,7 @@ const getNextMRN = async (religion) => {
   }
 };
 
-const createMRN = async (data, files = []) => {
+const createMRN = async (user, data, files = []) => {
   try {
     const statePrefix = data.stateOfOrigin.substring(0, 3).toUpperCase();
     const [fileNumber, mrn] = await Promise.all([
@@ -73,6 +73,7 @@ const createMRN = async (data, files = []) => {
       ...data,
       fileNumber,
       mrn,
+      createdBy: user._id,
     };
 
     const createdMrn = await mrnModel.create(fileData);
@@ -93,7 +94,10 @@ const createMRN = async (data, files = []) => {
 
 const getAllMRNs = async (projection = null) => {
   try {
-    const mrns = await mrnModel.find({}, projection);
+    const mrns = await mrnModel.find({}, projection).populate({
+      path: "createdBy",
+      select: "name email userName station department drn fileNumber phone",
+    });
 
     // Only fetch files if no projection or if projection includes files
     const shouldFetchFiles =
@@ -120,7 +124,10 @@ const getAllMRNs = async (projection = null) => {
 
 const getMRNById = async (id, projection = null) => {
   try {
-    const mrn = await mrnModel.findById(id, projection);
+    const mrn = await mrnModel.findById(id, projection).populate({
+      path: "createdBy",
+      select: "name email userName station department drn fileNumber phone",
+    });
     if (!mrn) {
       throw new Error("MRN not found");
     }
@@ -193,7 +200,13 @@ const deleteMRN = async (id) => {
 
 const getByMRN = async (mrnNumber, projection = null) => {
   try {
-    const mrn = await mrnModel.findOne({ mrn: mrnNumber }, projection);
+    const mrn = await mrnModel
+      .findOne({ mrn: mrnNumber }, projection)
+      .populate({
+        path: "createdBy",
+        select: "name email userName station department drn fileNumber phone",
+      });
+
     if (!mrn) {
       throw new Error("MRN not found with this number");
     }
