@@ -126,7 +126,7 @@ const mrnSchema = new mongoose.Schema(
     // Changed to 'User' to match your service + populate usage
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      ref: 'Station',
       required: true,
     },
   },
